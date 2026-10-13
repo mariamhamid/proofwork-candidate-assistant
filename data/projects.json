@@ -1,0 +1,30 @@
+[
+  {
+    "id": "P1",
+    "title": "Clean and analyze a donor spreadsheet",
+    "skills": ["excel", "python"],
+    "hours_per_week": 6,
+    "duration_weeks": 4
+  },
+  {
+    "id": "P2",
+    "title": "FAQ chatbot for a community library",
+    "skills": ["python", "llm apis"],
+    "hours_per_week": 8,
+    "duration_weeks": 4
+  },
+  {
+    "id": "P3",
+    "title": "Redesign a sign-up form",
+    "skills": ["ux", "figma"],
+    "hours_per_week": 5,
+    "duration_weeks": 3
+  },
+  {
+    "id": "P4",
+    "title": "Translate a training guide into Arabic",
+    "skills": ["arabic", "english"],
+    "hours_per_week": 3,
+    "duration_weeks": 2
+  }
+]

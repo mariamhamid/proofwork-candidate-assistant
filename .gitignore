@@ -1,0 +1,12 @@
+# Secrets: never commit
+.env
+
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Alerts contain candidate messages (privacy)
+flags.log

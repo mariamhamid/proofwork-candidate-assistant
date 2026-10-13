@@ -1,0 +1,38 @@
+[
+  {
+    "id": "H1",
+    "title": "How it works",
+    "language": "en",
+    "text": "Candidates complete short, real projects (2-4 weeks) for partner organizations. When the organization approves the work, the candidate earns a verified skill badge. Hiring partners can see badges on candidate profiles."
+  },
+  {
+    "id": "H2",
+    "title": "Time commitment",
+    "language": "en",
+    "text": "Projects need 3-8 hours per week, as listed on each project. The minimum is 3 hours per week."
+  },
+  {
+    "id": "H3",
+    "title": "Badges",
+    "language": "en",
+    "text": "Organizations review submitted work within 7 days. A badge is issued when the work is rated \"meets expectations\" or higher. If not, the candidate can resubmit once."
+  },
+  {
+    "id": "H4",
+    "title": "Getting stuck",
+    "language": "en",
+    "text": "If an organization does not reply within 5 working days, contact the pilot coordinator. The coordinator replies within 48 hours."
+  },
+  {
+    "id": "H5",
+    "title": "Jobs",
+    "language": "en",
+    "text": "Hiring partners may invite candidates with badges to interviews. Proofwork does not guarantee a job."
+  },
+  {
+    "id": "H6",
+    "title": "Projects at once",
+    "language": "ar",
+    "text": "يمكنك العمل على مشروعين كحد أقصى في الوقت نفسه. يجب إنهاء مشروع واحد على الأقل قبل البدء بمشروع ثالث."
+  }
+]
