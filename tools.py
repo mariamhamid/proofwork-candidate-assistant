@@ -1,11 +1,3 @@
-"""
-tools.py - the agent's 3 tools.
-
-1. search_handbook   -> finds the handbook entry that answers a question (uses embeddings)
-2. match_projects    -> picks projects with fixed Python rules (no AI involved)
-3. flag_coordinator  -> alerts Lina (simulated: printed + saved to flags.log)
-"""
-
 import json
 import os
 from datetime import datetime
@@ -15,13 +7,13 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-client = OpenAI()  # reads OPENAI_API_KEY from .env
+client = OpenAI()  
 
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-MIN_SCORE = 0.30          # below this similarity, we say "not found" (tuned on test #6)
-MIN_HOURS = 3             # handbook rule H2: minimum is 3 hours per week
+MIN_SCORE = 0.30         
+MIN_HOURS = 3             
 
-# ---------- Load the data once ----------
+
 with open("data/handbook.json", encoding="utf-8") as f:
     HANDBOOK = json.load(f)
 
@@ -29,19 +21,17 @@ with open("data/projects.json", encoding="utf-8") as f:
     PROJECTS = json.load(f)
 
 
-# =====================================================
-# Tool 1: search_handbook
-# =====================================================
+
 def embed(texts):
     """Turn a list of texts into vectors (lists of numbers that capture meaning)."""
     response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
     return np.array([item.embedding for item in response.data])
 
 
-_handbook_vectors = None  # filled the first time we search, then reused
+_handbook_vectors = None  
 
 
-def search_handbook(query, top_k=3):  # 3, not 2: H5 ranked 3rd for "job after 3 projects" (test 5)
+def search_handbook(query, top_k=3):
     """Return the handbook entries closest in meaning to the query, with their IDs."""
     global _handbook_vectors
     if _handbook_vectors is None:
@@ -50,12 +40,12 @@ def search_handbook(query, top_k=3):  # 3, not 2: H5 ranked 3rd for "job after 3
 
     query_vector = embed([query])[0]
 
-    # Cosine similarity: 1 = same meaning, 0 = unrelated
+    
     scores = _handbook_vectors @ query_vector / (
         np.linalg.norm(_handbook_vectors, axis=1) * np.linalg.norm(query_vector)
     )
 
-    best = np.argsort(scores)[::-1][:top_k]  # indexes of highest scores
+    best = np.argsort(scores)[::-1][:top_k] 
     results = [
         {
             "id": HANDBOOK[i]["id"],
@@ -72,10 +62,9 @@ def search_handbook(query, top_k=3):  # 3, not 2: H5 ranked 3rd for "job after 3
     return {"found": True, "results": results}
 
 
-# =====================================================
-# Tool 2: match_projects  (pure rules, no AI)
-# =====================================================
-# Different words people use -> the skill name used in projects.json
+
+
+
 SKILL_SYNONYMS = {
     "spreadsheet": "excel",
     "spreadsheets": "excel",
@@ -98,7 +87,7 @@ def match_projects(skills, hours_per_week):
     """Rule 1: minimum hours. Rule 2: hours filter. Rule 3: skill score. Rule 4: rank."""
     candidate_skills = {normalize_skill(s) for s in skills}
 
-    # Rule 1: handbook minimum (H2)
+  
     if hours_per_week < MIN_HOURS:
         return {
             "matches": [],
@@ -114,9 +103,9 @@ def match_projects(skills, hours_per_week):
         score = len(have) / len(needed)
 
         if score == 0:
-            continue  # no shared skills, skip
+            continue  
 
-        # Rule 2: hours are a hard limit
+       
         if project["hours_per_week"] > hours_per_week:
             too_many_hours.append(
                 {"id": project["id"], "title": project["title"],
@@ -137,7 +126,7 @@ def match_projects(skills, hours_per_week):
             }
         )
 
-    # Rule 4: best skill match first; if tied, fewer hours first
+   
     matches.sort(key=lambda m: (-m["score"], m["hours_per_week"]))
 
     result = {"matches": matches}
@@ -148,9 +137,9 @@ def match_projects(skills, hours_per_week):
     return result
 
 
-# =====================================================
-# Tool 3: flag_coordinator
-# =====================================================
+
+
+
 def flag_coordinator(message, reason):
     """Alert Lina. In the pilot this prints and logs; later it could email or Slack her."""
     alert = {

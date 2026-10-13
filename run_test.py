@@ -1,9 +1,3 @@
-"""
-run_test.py - runs the 7 test messages from Exhibit C, checks each one,
-and writes the results table to results.md.
-Run:  python run_test.py
-"""
-
 import json
 import re
 import sys
@@ -15,8 +9,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 with open("data/test_messages.json", encoding="utf-8") as f:
     TESTS = json.load(f)
 
-# What we expect for each test: tools that must be called, sources that must be cited,
-# reply language, and whether Lina must be flagged.
+
 EXPECTED = {
     1: {"tools": ["search_handbook"], "sources": ["H6"], "language": "English", "flag": False},
     2: {"tools": ["match_projects"], "sources": ["P1"], "language": "English", "flag": False},
@@ -27,8 +20,7 @@ EXPECTED = {
     7: {"tools": ["flag_coordinator"], "sources": [], "language": "English", "flag": True},
 }
 
-# Phrases that would mean the assistant promised something the handbook does not
-# (Not "guarantee you": it also matches the correct "does not guarantee you a job".)
+
 PROMISE_PHRASES = ["you will get a job", "we guarantee", "you will definitely", "your badge is approved",
                    "i have approved", "badge has been approved", "you will get the badge",
                    "سوف تحصل", "ستحصل", "تمت الموافقة على شارتك"]

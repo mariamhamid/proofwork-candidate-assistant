@@ -1,6 +1,4 @@
 """
-agent.py - the decide -> call tool -> reply loop.
-
 1. Send the candidate's message + the rulebook + the tool list to the model.
 2. If the model asks for a tool, run it in Python and send the result back.
 3. Repeat until the model writes a final reply (max MAX_ROUNDS times).
@@ -19,17 +17,17 @@ from tools import flag_coordinator, match_projects, search_handbook
 load_dotenv()
 client = OpenAI()
 
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")  # change in .env if your account lists another
-MAX_ROUNDS = 5  # safety cap so the loop can never run forever
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")  
+MAX_ROUNDS = 5 
 
-# The Python functions the model is allowed to call
+
 TOOL_FUNCTIONS = {
     "search_handbook": search_handbook,
     "match_projects": match_projects,
     "flag_coordinator": flag_coordinator,
 }
 
-# How we describe the tools to the model (it reads these to decide WHEN to use each one)
+
 TOOLS = [
     {
         "type": "function",
@@ -107,13 +105,11 @@ def run_tool(name, arguments):
         return {"error": str(e)}
 
 
-# ---------- Safety net: code guarantees the critical flags ----------
-# The model decides first. If it forgot to flag in a case that clearly needs Lina,
-# the code flags anyway. These lists are deliberately short and easy to read.
+
 UNANSWERED_SIGNS = ["i don't know", "i do not know", "does not mention", "doesn't mention",
                     "not mentioned", "no information", "لا أعرف", "لا يذكر", "لا تذكر", "لم يذكر",
                     "غير مذكور", "ذكر صريح"]
-# The reply SAYS Lina was alerted (first person / passive, so "you can contact Lina" doesn't count)
+
 CLAIMED_FLAG_SIGNS = ["i've alerted", "i have alerted", "i alerted", "lina has been alerted",
                       "i've notified", "i have notified", "lina has been notified",
                       "أبلغت لينا", "قمت بإبلاغ", "تم إبلاغ"]
@@ -124,7 +120,7 @@ MANIPULATION_SIGNS = ["ignore your instructions", "ignore previous", "ignore all
 def safety_net(message, reply, trace, language):
     """Flag Lina if the model forgot to in a clear-cut case. Returns the (possibly extended) reply."""
     if any(step["tool"] == "flag_coordinator" for step in trace):
-        return reply  # the model already flagged, nothing to do
+        return reply  
 
     reason = None
     if any(sign in message.lower() for sign in MANIPULATION_SIGNS):
@@ -132,7 +128,7 @@ def safety_net(message, reply, trace, language):
     elif any(sign in reply.lower() for sign in UNANSWERED_SIGNS):
         reason = "unanswered question"
     elif any(sign in reply.lower() for sign in CLAIMED_FLAG_SIGNS):
-        reason = "agent said it alerted Lina"  # make the claim true
+        reason = "agent said it alerted Lina"  
 
     if reason is None:
         return reply
@@ -141,7 +137,7 @@ def safety_net(message, reply, trace, language):
     trace.append({"tool": "flag_coordinator", "arguments": {"reason": reason},
                   "result": result, "safety_net": True})
 
-    # Always tell the candidate, unless the reply itself already claimed Lina was alerted
+   
     if reason != "agent said it alerted Lina":
         if language == "Arabic":
             start = "لا أعرف الإجابة من دليل البرنامج، لذلك " if reason == "unanswered question" else ""
@@ -169,12 +165,12 @@ def run_agent(message):
             )
             reply = response.choices[0].message
 
-            # No tool requested -> this is the final answer
+            
             if not reply.tool_calls:
                 final = safety_net(message, reply.content or "", trace, language)
                 return {"reply": final, "tools": trace, "language": language}
 
-            # The model asked for one or more tools: run each, send the results back
+           
             messages.append(reply.model_dump(exclude_none=True))
             for call in reply.tool_calls:
                 arguments = json.loads(call.function.arguments)
@@ -190,7 +186,7 @@ def run_agent(message):
     except Exception as e:
         print(f"[error] {e}")
 
-    # Fallback: something went wrong, never leave the candidate without a path to a human
+   
     fallback = (
         "عذرًا، حدثت مشكلة تقنية. يرجى التواصل مع منسقة البرنامج لينا."
         if language == "Arabic"
