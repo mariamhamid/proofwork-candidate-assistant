@@ -1,8 +1,3 @@
-"""
-test_tools.py - checks each tool on its own, before the AI is involved.
-Run:  python test_tools.py
-"""
-
 from tools import flag_coordinator, match_projects, search_handbook
 
 
